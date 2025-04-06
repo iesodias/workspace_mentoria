@@ -19,6 +19,16 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Check/Create Resource Group
+        id: rg-check
+        run: |
+          if ! az group show --name bicep-rg --query id -o tsv 2>/dev/null; then
+            az group create --name bicep-rg --location eastus
+            echo "Resource Group criado"
+          else
+            echo "Resource Group já existe"
+          fi
+
       - name: Deploy VM
         run: |
           az deployment group create \
