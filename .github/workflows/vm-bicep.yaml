@@ -31,10 +31,11 @@ jobs:
 
       - name: Deploy VM
         run: |
-          az deployment group create \
-            --resource-group bicep-rg \
-            --template-file files/vm.bicep \
-            --parameters \
-                vmName='github-vm-${{ github.run_id }}' \
-                adminUsername='azureuser' \
-                adminPassword='${{ secrets.VM_PASSWORD }}'
+          SHORT_RUN_ID=$(echo "${{ github.run_id }}" | tail -c 4)
+            az deployment group create \
+              --resource-group bicep-rg \
+              --template-file files/vm.bicep \
+              --parameters \
+                  vmName="vm-${SHORT_RUN_ID}" \
+                  adminUsername='azureuser' \
+                  adminPassword='${{ secrets.VM_PASSWORD }}'
