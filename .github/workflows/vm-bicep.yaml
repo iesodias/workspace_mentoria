@@ -4,7 +4,8 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ]
-    paths: [ 'vm.bicep' ]
+    paths:
+      - 'files/vm.bicep'
 
 jobs:
   deploy:
@@ -18,19 +19,12 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Create Resource Group
-        if: ${{ !contains(steps.resource-group-check.outputs.exists, 'true') }}
-        run: |
-          az group create \
-            --name bicep-rg \
-            --location eastus
-
       - name: Deploy VM
         run: |
           az deployment group create \
             --resource-group bicep-rg \
-            --template-file vm.bicep \
+            --template-file files/vm.bicep \
             --parameters \
-                vmName='github-vm' \
+                vmName='github-vm-${{ github.run_id }}' \
                 adminUsername='azureuser' \
                 adminPassword='${{ secrets.VM_PASSWORD }}'
